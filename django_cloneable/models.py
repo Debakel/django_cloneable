@@ -63,7 +63,13 @@ class ModelCloneHelper(object):
 
             # Check for one to many:
             if field.one_to_many:
+                '''
+                This seems to assume that foreign keys don't have related names
+                keeping in case I need to allow for this functionality in addition
+                to named relationships
                 f_name = '%s_set' % field.name
+                '''
+                f_name = field.name
 
                 # Collect the objects which contain ForeignKey pointing to the source object
                 fks_to_copy = list(getattr(self.instance, f_name).all())
