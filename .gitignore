@@ -5,3 +5,4 @@
 /tests/db.sqlite
 /.cache/
 /.coverage
+.idea/
