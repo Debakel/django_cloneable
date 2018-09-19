@@ -63,10 +63,21 @@ class ModelCloneHelper(object):
 
             # Check for one to many:
             if field.one_to_many:
+                '''
+                This seems to assume that foreign keys don't have related names
+                keeping in case I need to allow for this functionality in addition
+                to named relationships
                 f_name = '%s_set' % field.name
+                '''
+                f_name = field.name
 
                 # Collect the objects which contain ForeignKey pointing to the source object
-                fks_to_copy = list(getattr(self.instance, f_name).all())
+
+                try:
+                    fks_to_copy = list(getattr(self.instance, f_name).all())
+                except AttributeError:
+                    f_name = '%s_set' % f_name
+                    fks_to_copy = list(getattr(self.instance, f_name).all())
 
                 for fk in fks_to_copy:
                     # Empty primary key
@@ -88,7 +99,12 @@ class ModelCloneHelper(object):
 
         # Insert the new records in the database
         for cls, list_of_fks in foreign_keys.items():
-            cls.objects.bulk_create(list_of_fks)
+            try:
+                cls.objects.bulk_create(list_of_fks)
+            except ValueError:
+                print(list_of_fks)
+                print(cls)
+
 
     def _clone_copy_m2m(self, duplicate, exclude=None):
         exclude = exclude or []
